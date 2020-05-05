@@ -10,6 +10,6 @@ namespace Commandr.Results
     /// </summary>
     public interface ICommandResult
     {
-        Task Execute(HttpContext context);
+        Task ExecuteAsync(HttpContext context);
     }
 }

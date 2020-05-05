@@ -12,6 +12,6 @@ namespace Commandr
     /// </remarks>
     public interface ICommandBus
     {
-        Task<object> InvokeCommand(IRoutableCommand command);
+        Task<object> InvokeCommandAsync(IRoutableCommand command);
     }
 }

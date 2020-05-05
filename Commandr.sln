@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commandr", "src\Commandr\Commandr.csproj", "{357DDBA2-8C5C-4832-82E3-20A4175AE0BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commandr.Samples.Jasper", "samples\Commandr.Samples.Jasper\Commandr.Samples.Jasper.csproj", "{1B14D962-69C2-4CBF-9A72-99DA5C7EA034}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{2A89AEAF-A5BD-4870-961F-71AFFA2984F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{357DDBA2-8C5C-4832-82E3-20A4175AE0BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{357DDBA2-8C5C-4832-82E3-20A4175AE0BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{357DDBA2-8C5C-4832-82E3-20A4175AE0BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B14D962-69C2-4CBF-9A72-99DA5C7EA034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B14D962-69C2-4CBF-9A72-99DA5C7EA034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B14D962-69C2-4CBF-9A72-99DA5C7EA034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B14D962-69C2-4CBF-9A72-99DA5C7EA034}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1B14D962-69C2-4CBF-9A72-99DA5C7EA034} = {2A89AEAF-A5BD-4870-961F-71AFFA2984F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {31701789-7929-4050-AD76-3F4595586EE3}

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -90,40 +90,6 @@ namespace Commandr
             }
 
             return endpoints;
-        }
-    }
-
-    public class CommandEndpointConfigurationBuilder
-    {
-        private readonly CommandEndpointDataSource _dataSource;
-
-        public CommandEndpointConfigurationBuilder(CommandEndpointDataSource dataSource)
-        {
-            _dataSource = dataSource;
-        }
-
-        public void AddCommand(Type commandType)
-        {
-            _dataSource.AddCommandType(commandType);
-        }
-
-        public void AddCommand<TCommand>() where TCommand : IRoutableCommand
-        {
-            AddCommand(typeof(TCommand));
-        }
-    }
-
-    public static class CommandEndpointRouteBuilderExtensions
-    {
-        public static IEndpointConventionBuilder MapCommands(this IEndpointRouteBuilder endpoints, Action<CommandEndpointConfigurationBuilder> configure)
-        {
-            var dataSource = endpoints.ServiceProvider.GetRequiredService<CommandEndpointDataSource>();
-
-            var configBuilder = new CommandEndpointConfigurationBuilder(dataSource);
-            configure(configBuilder);
-
-            endpoints.DataSources.Add(dataSource);
-            return dataSource;
         }
     }
 }

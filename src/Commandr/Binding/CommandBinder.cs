@@ -23,7 +23,7 @@ namespace Commandr.Binding
             _lazyBindingContext = new Lazy<CommandBindingContext>(BuildBindingContext, LazyThreadSafetyMode.PublicationOnly);
         }
 
-        public async Task<object> GenerateCommand(HttpRequest request)
+        public async Task<object> GenerateCommandAsync(HttpRequest request)
         {
             if(BindingContext.DirectFromBody)
                 return await DeserializeCommandFromBody(request);
@@ -156,12 +156,12 @@ namespace Commandr.Binding
             return bindingContext;
         }
 
-        private struct RequestBindingContext
+        private class RequestBindingContext
         {
             private JObject _bodyObject;
             private IFormCollection _formData;
 
-            public RequestBindingContext(object command, HttpRequest request) : this()
+            public RequestBindingContext(object command, HttpRequest request)
             {
                 Command = command;
                 Request = request;

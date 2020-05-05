@@ -13,7 +13,7 @@ namespace Commandr.Results
             _result = result;
         }
 
-        public Task Execute(HttpContext context)
+        public Task ExecuteAsync(HttpContext context)
         {
             throw new NotImplementedException();
         }
