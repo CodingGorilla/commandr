@@ -133,7 +133,7 @@ namespace Commandr.Binding
         private CommandBindingContext BuildBindingContext()
         {
             var commandBindingAttrs = _commandType.GetCustomAttributes<CommandBindingAttribute>();
-            if(commandBindingAttrs.Any(ba => ba.GetType() == typeof(DirectFromRequestBodyAttribute)))
+            if(commandBindingAttrs.Any(ba => ba.GetType() == typeof(FromJsonBodyAttribute)))
             {
                 return new CommandBindingContext(true);
             }

@@ -7,13 +7,13 @@ namespace Commandr.Samples.Jasper
     [CommandRoute("/people/{id}", "PUT")]
     public class UpdatePersonCommand : IRoutableCommand
     {
-        [FromRequestUrl("id")] 
+        [FromUrlTemplate("id")] 
         public int Id { get; set; }
 
-        [FromRequestBody] 
+        [FromJsonToken] 
         public string FirstName { get; set; }
 
-        [FromRequestBody] 
+        [FromJsonToken] 
         public string LastName { get; set; }
     }
 

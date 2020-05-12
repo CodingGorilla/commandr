@@ -3,9 +3,9 @@
 namespace Commandr.Binding
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class DirectFromRequestBodyAttribute : CommandBindingAttribute
+    public class FromJsonBodyAttribute : CommandBindingAttribute
     {
-        public DirectFromRequestBodyAttribute()
+        public FromJsonBodyAttribute()
         {
         }
 

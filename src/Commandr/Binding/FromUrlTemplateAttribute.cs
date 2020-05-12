@@ -3,9 +3,9 @@
 namespace Commandr.Binding
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class FromRequestUrl : CommandBindingAttribute
+    public class FromUrlTemplateAttribute : CommandBindingAttribute
     {
-        public FromRequestUrl(string parameterName)
+        public FromUrlTemplateAttribute(string parameterName)
         {
             Name = parameterName;
         }

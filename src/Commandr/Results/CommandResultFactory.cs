@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace Commandr.Results
 {
@@ -12,7 +11,7 @@ namespace Commandr.Results
         ICommandResult Ok(object content);
     }
 
-    public class CommandResultFactory : ICommandResultFactory
+    internal class CommandResultFactory : ICommandResultFactory
     {
         public ICommandResult Status(int statusCode)
         {

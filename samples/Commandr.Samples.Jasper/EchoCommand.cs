@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Commandr.Samples.Jasper
 {
     [CommandRoute("/echo", "GET")]
-    [DirectFromRequestBody]
+    [FromJsonBody]
     public class EchoCommand : IRoutableCommand
     {
         public string Message { get; set; }

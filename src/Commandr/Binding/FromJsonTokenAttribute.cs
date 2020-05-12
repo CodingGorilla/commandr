@@ -3,13 +3,13 @@
 namespace Commandr.Binding
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class FromRequestBodyAttribute : CommandBindingAttribute
+    public class FromJsonTokenAttribute : CommandBindingAttribute
     {
-        public FromRequestBodyAttribute()
+        public FromJsonTokenAttribute()
         {
         }
 
-        public FromRequestBodyAttribute(string memberName)
+        public FromJsonTokenAttribute(string memberName)
         {
             Name = memberName;
         }
