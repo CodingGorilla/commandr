@@ -6,9 +6,9 @@ namespace Commandr
 {
     public class CommandEndpointConfigurationBuilder
     {
-        private readonly CommandEndpointDataSource _dataSource;
+        private readonly CommandrEndpointDataSource _dataSource;
 
-        public CommandEndpointConfigurationBuilder(CommandEndpointDataSource dataSource)
+        public CommandEndpointConfigurationBuilder(CommandrEndpointDataSource dataSource)
         {
             _dataSource = dataSource;
         }

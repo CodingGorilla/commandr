@@ -7,21 +7,22 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 
 namespace Commandr
 {
-    public class CommandEndpointDataSource : EndpointDataSource, IEndpointConventionBuilder
+    public class CommandrEndpointDataSource : EndpointDataSource, IEndpointConventionBuilder
     {
         private List<Endpoint> _endpoints;
         private readonly List<Action<EndpointBuilder>> _conventions;
         private readonly List<Type> _commandTypes;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<CommandEndpointDataSource> _logger;
+        private readonly ILogger<CommandrEndpointDataSource> _logger;
 
-        public CommandEndpointDataSource(IServiceProvider serviceProvider, ILogger<CommandEndpointDataSource> logger)
+        public CommandrEndpointDataSource(IServiceProvider serviceProvider, ILogger<CommandrEndpointDataSource> logger)
         {
             _conventions = new List<Action<EndpointBuilder>>();
             _commandTypes = new List<Type>();
@@ -53,6 +54,11 @@ namespace Commandr
         private List<Endpoint> BuildEndpoints()
         {
             var endpoints = new List<Endpoint>();
+            
+            if(!_commandTypes.Any())
+                return endpoints;
+
+            var dispatcherFactory = _serviceProvider.GetRequiredService<ICommandDispatcherFactory>();
 
             // Step 1: Locate all of the commands
             foreach(var cmdType in _commandTypes)
@@ -66,7 +72,7 @@ namespace Commandr
 
                 var authorizeAttribute = cmdType.GetCustomAttribute<AuthorizeAttribute>();
 
-                var commandDispatcher = new CommandDispatcher(cmdType, _serviceProvider);
+                var commandDispatcher = dispatcherFactory.GetDispatcher(cmdType);
 
                 var endpointBuilder = new RouteEndpointBuilder(
                                           context => commandDispatcher.Dispatch(context),

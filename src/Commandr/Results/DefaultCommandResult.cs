@@ -6,16 +6,26 @@ namespace Commandr.Results
 {
     public class DefaultCommandResult : ICommandResult
     {
-        private readonly string _result;
+        private readonly object _result;
 
-        public DefaultCommandResult(string result)
+        public DefaultCommandResult(object result)
         {
             _result = result;
         }
 
-        public Task ExecuteAsync(HttpContext context)
+        public async Task ExecuteAsync(HttpContext context)
         {
-            throw new NotImplementedException();
+            if(!(_result is null))
+            {
+                context.Response.StatusCode = 200;
+                await context.Response.WriteAsync(_result.ToString());
+            }
+            else
+            {
+                context.Response.StatusCode = 204;
+            }
+
+            await context.Response.CompleteAsync();
         }
     }
 }

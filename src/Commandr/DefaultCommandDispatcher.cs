@@ -7,20 +7,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Commandr
 {
-    public class CommandDispatcher
+    public class DefaultCommandDispatcher : ICommandDispatcher
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly CommandBinder _commandBinder;
 
-        public CommandDispatcher(Type commandType, IServiceProvider serviceProvider)
+        public DefaultCommandDispatcher(Type commandType)
         {
-            _serviceProvider = serviceProvider;
             _commandBinder = new CommandBinder(commandType);
         }
 
         public async Task Dispatch(HttpContext context)
         {
-            var commandBus = _serviceProvider.GetRequiredService<ICommandBus>();
+            var commandBus = context.RequestServices.GetRequiredService<ICommandBus>();
 
             var command = await _commandBinder.GenerateCommandAsync(context.Request).ConfigureAwait(false);
             if(!(command is IRoutableCommand routableCommand))
@@ -39,7 +37,7 @@ namespace Commandr
                     return;
 
                 default:
-                    var defaultResult = new DefaultCommandResult(result?.ToString() ?? "NULL");
+                    var defaultResult = new DefaultCommandResult(result);
                     await defaultResult.ExecuteAsync(context).ConfigureAwait(false);
                     return;
             }
