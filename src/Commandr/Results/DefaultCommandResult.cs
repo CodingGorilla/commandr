@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Commandr.Results
 {
@@ -26,6 +27,39 @@ namespace Commandr.Results
             }
 
             await context.Response.CompleteAsync();
+        }
+
+        private static ICommandResult DetermineBestResponseType(object result)
+        {
+            switch(result)
+            {
+                case null:
+                    return new StatusCodeResult(204); // No content
+
+                case string stringResult:
+                    return new PlainTextResult(200, stringResult);
+
+                case sbyte _: 
+                case byte _: 
+                case short _:
+                case ushort _:
+                case int _: 
+                case uint _: 
+                case long _: 
+                case ulong _:
+                case float _:
+                case double _: 
+                case decimal _:
+                    return new PlainTextResult(200, result.ToString());
+
+                case Exception ex:
+                    return new ExceptionResult(ex);
+
+                // TODO: Others?
+
+                default:
+                    return new OkContentResult(result);
+            }
         }
     }
 }
