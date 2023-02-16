@@ -1,5 +1,4 @@
 ﻿using System;
-using Commandr.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,35 +21,4 @@ namespace Commandr
             return dataSource;
         }
     }
-
-    public static class CommandrEndpointServiceBuilderExtensions
-    {
-        public static void AddCommandr(this WebApplicationBuilder builder)
-        {
-            AddCommandr(builder.Services);
-        }
-
-        public static void AddCommandr(this IServiceCollection serviceCollection, Action<CommandrConfigurationBuilder>? configBuilder = null)
-        {
-            serviceCollection.AddSingleton<ICommandResultFactory, CommandResultFactory>();
-            serviceCollection.AddTransient<CommandrEndpointDataSource>();
-            serviceCollection.AddTransient<ICommandDispatcherFactory, DefaultCommandDispatcherFactory>();
-
-            if(configBuilder == null) 
-                return;
-            
-            var builder = new CommandrConfigurationBuilder(serviceCollection);
-            configBuilder.Invoke(builder);
-        }
     }
-
-    public class CommandrConfigurationBuilder
-    {
-        public IServiceCollection ServiceCollection { get; }
-
-        internal CommandrConfigurationBuilder(IServiceCollection serviceCollection)
-        {
-            ServiceCollection = serviceCollection;
-        }
-    }
-}
