@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 
 namespace Commandr.Results
 {
@@ -22,8 +21,7 @@ namespace Commandr.Results
             context.Response.StatusCode = StatusCode;
 
             context.Response.ContentType = "application/json";
-            var contentString = JsonConvert.SerializeObject(_content);
-            await context.Response.WriteAsync(contentString);
+            await JsonSerializer.SerializeAsync(context.Response.Body, _content);
 
             await context.Response.CompleteAsync();
         }

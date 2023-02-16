@@ -1,46 +1,81 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Commandr.Binding;
+using Commandr.Exceptions;
 using Commandr.Results;
+using Commandr.Utility;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Commandr
 {
     public class DefaultCommandDispatcher : ICommandDispatcher
     {
-        private readonly CommandBinder _commandBinder;
+        private readonly Type _commandType;
 
         public DefaultCommandDispatcher(Type commandType)
         {
-            _commandBinder = new CommandBinder(commandType);
+            _commandType = commandType;
         }
 
         public async Task Dispatch(HttpContext context)
         {
-            var commandBus = context.RequestServices.GetRequiredService<ICommandBus>();
+            var commandHandler = context.RequestServices.GetService(_commandType);
+            if(commandHandler == null)
+                throw new CommandHandlerNotFoundException(_commandType);
 
-            var command = await _commandBinder.GenerateCommandAsync(context.Request).ConfigureAwait(false);
-            if(!(command is IRoutableCommand routableCommand))
+            var commandInvokeMethod = LocateCommandInvokeMethod();
+            if(commandInvokeMethod == null)
             {
                 context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("The route resulted in a command which could not be executed").ConfigureAwait(false);
+                await context.Response.WriteAsync($"Unable to locate the Invoke method for command: {_commandType.Name}");
+                await context.Response.CompleteAsync();
                 return;
             }
 
-            var result = await commandBus.InvokeCommandAsync(routableCommand).ConfigureAwait(false);
+            var commandArguments = await new ArgumentBinder(commandInvokeMethod).GetMethodParametersAsync(context);
 
-            switch(result)
+            var result = commandInvokeMethod.Invoke(commandHandler, commandArguments);
+            object? finalResult = null;
+
+            var resultType = result?.GetType() ?? typeof(void);
+            if(resultType.BaseType == typeof(Task) || resultType.BaseType?.GetGenericTypeDefinition() == typeof(Task<>))
             {
-                case ICommandResult commandResult:
-                    await commandResult.ExecuteAsync(context).ConfigureAwait(false);
-                    return;
+                var task = (Task)result!;
+                await task;
 
-                default:
-                    var defaultResult = new DefaultCommandResult(result);
-                    await defaultResult.ExecuteAsync(context).ConfigureAwait(false);
-                    return;
+                if(resultType.IsGenericType)
+                    finalResult = task.GetType().GetProperty("Result")?.GetValue(task);
             }
+            else
+            {
+                finalResult = result;
+            }
+
+            if(finalResult is ICommandResult commandResult)
+                await commandResult.ExecuteAsync(context).ConfigureAwait(false);
+            else
+            {
+                var defaultResult = new DefaultCommandResult(finalResult);
+                await defaultResult.ExecuteAsync(context).ConfigureAwait(false);
+            }
+        }
+
+        private MethodInfo? LocateCommandInvokeMethod()
+        {
+            var methods = _commandType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            foreach(var methodInfo in methods)
+            {
+                var methodName = methodInfo.Name;
+                if(methodName.EndsWith("Async", StringComparison.InvariantCultureIgnoreCase))
+                    methodName = methodName.Remove(methodName.Length - 5, 5);
+
+                if(methodName.EqualsIgnoreCase("handles") || methodName.EqualsIgnoreCase("invoke") || methodName.EqualsIgnoreCase("invokes") ||
+                   methodName.EqualsIgnoreCase("consumes"))
+                    return methodInfo;
+            }
+
+            return null;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Commandr.Routing;
 
 namespace Commandr
 {
@@ -21,7 +22,7 @@ namespace Commandr
         public void AddAssembly(Assembly assembly)
         {
             var commandTypes = assembly.GetTypes()
-                                       .Where(t => t.GetInterfaces().Any(it => it == typeof(IRoutableCommand)))
+                                       .Where(t => t.GetCustomAttributes<CommandRouteAttribute>().Any())
                                        .ToList();
 
             commandTypes.ForEach(AddCommand);
@@ -32,7 +33,7 @@ namespace Commandr
             AddAssembly(Assembly.GetEntryAssembly());
         }
 
-        public void AddCommand<TCommand>() where TCommand : IRoutableCommand
+        public void AddCommand<TCommand>()
         {
             AddCommand(typeof(TCommand));
         }

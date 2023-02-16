@@ -2,7 +2,7 @@
 
 namespace Commandr.Binding
 {
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     public class FromUrlTemplateAttribute : CommandBindingAttribute
     {
         public FromUrlTemplateAttribute(string parameterName)

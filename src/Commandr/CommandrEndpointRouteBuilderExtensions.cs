@@ -8,6 +8,9 @@ namespace Commandr
 {
     public static class CommandrEndpointRouteBuilderExtensions
     {
+        public static IEndpointConventionBuilder MapCommands(this IEndpointRouteBuilder endpoints)
+            => MapCommands(endpoints, _ => _.AddExecutingAssembly());
+
         public static IEndpointConventionBuilder MapCommands(this IEndpointRouteBuilder endpoints, Action<CommandEndpointConfigurationBuilder> configure)
         {
             var dataSource = endpoints.ServiceProvider.GetRequiredService<CommandrEndpointDataSource>();
@@ -22,17 +25,22 @@ namespace Commandr
 
     public static class CommandrEndpointServiceBuilderExtensions
     {
-        public static void AddCommandr(this IServiceCollection serviceCollection, Action<CommandrConfigurationBuilder> configBuilder = null)
+        public static void AddCommandr(this WebApplicationBuilder builder)
+        {
+            AddCommandr(builder.Services);
+        }
+
+        public static void AddCommandr(this IServiceCollection serviceCollection, Action<CommandrConfigurationBuilder>? configBuilder = null)
         {
             serviceCollection.AddSingleton<ICommandResultFactory, CommandResultFactory>();
             serviceCollection.AddTransient<CommandrEndpointDataSource>();
             serviceCollection.AddTransient<ICommandDispatcherFactory, DefaultCommandDispatcherFactory>();
 
-            if(configBuilder != null)
-            {
-                var builder = new CommandrConfigurationBuilder(serviceCollection);
-                configBuilder.Invoke(builder);
-            }
+            if(configBuilder == null) 
+                return;
+            
+            var builder = new CommandrConfigurationBuilder(serviceCollection);
+            configBuilder.Invoke(builder);
         }
     }
 

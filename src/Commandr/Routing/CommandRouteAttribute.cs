@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Commandr
+namespace Commandr.Routing
 {
     /// <summary>
-    /// Defines routing information for a <seealso cref="IRoutableCommand"/>
+    /// Defines routing information for a command
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class CommandRouteAttribute : Attribute
     {
         public CommandRouteAttribute(string template, string method)

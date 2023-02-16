@@ -2,7 +2,7 @@
 
 namespace Commandr.Binding
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     public class FromJsonBodyAttribute : CommandBindingAttribute
     {
         public FromJsonBodyAttribute()

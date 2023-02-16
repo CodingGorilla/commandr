@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Buffer = System.Buffer;
 
 
 namespace Commandr.Utility
@@ -25,6 +21,11 @@ namespace Commandr.Utility
             {
                 action.Invoke(item);
             }
+        }
+
+        public static bool EqualsIgnoreCase(this string value, string other)
+        {
+            return String.Equals(value, other, StringComparison.InvariantCultureIgnoreCase);
         }
 
         public static ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter Caf<T>(this Task<T> task)

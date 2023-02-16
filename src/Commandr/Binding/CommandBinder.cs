@@ -223,7 +223,7 @@ namespace Commandr.Binding
             public CommandBindingContext(bool directFromBody) : this()
             {
                 DirectFromBody = directFromBody;
-                Properties = new PropertyBindingContext[0];
+                Properties = Array.Empty<PropertyBindingContext>();
             }
 
             public CommandBindingContext(IEnumerable<PropertyBindingContext> properties) : this()

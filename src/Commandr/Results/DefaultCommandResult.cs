@@ -1,29 +1,34 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Commandr.Results
 {
     public class DefaultCommandResult : ICommandResult
     {
-        private readonly object _result;
+        private readonly object? _result;
 
-        public DefaultCommandResult(object result)
+        public DefaultCommandResult(object? result)
         {
             _result = result;
         }
 
         public async Task ExecuteAsync(HttpContext context)
         {
-            if(!(_result is null))
+            if(_result is null)
+            {
+                context.Response.StatusCode = 204;
+            }
+            else if(_result.GetType().IsPrimitive)
             {
                 context.Response.StatusCode = 200;
-                await context.Response.WriteAsync(_result.ToString());
+                await context.Response.WriteAsync(_result.ToString() ?? string.Empty);
             }
             else
             {
-                context.Response.StatusCode = 204;
+                context.Response.StatusCode = 200;
+                await JsonSerializer.SerializeAsync(context.Response.Body, _result);
             }
 
             await context.Response.CompleteAsync();

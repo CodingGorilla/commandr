@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Commandr.Routing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -16,7 +17,7 @@ namespace Commandr
 {
     public class CommandrEndpointDataSource : EndpointDataSource, IEndpointConventionBuilder
     {
-        private List<Endpoint> _endpoints;
+        private List<Endpoint>? _endpoints;
         private readonly List<Action<EndpointBuilder>> _conventions;
         private readonly List<Type> _commandTypes;
         private readonly IServiceProvider _serviceProvider;
@@ -30,12 +31,9 @@ namespace Commandr
             _serviceProvider = serviceProvider;
             _logger = logger;
         }
-
+        
         public void AddCommandType(Type commandType)
         {
-            if(commandType.IsAssignableFrom(typeof(IRoutableCommand)))
-                throw new ArgumentException("The specified type is not an IRoutableCommand");
-
             _commandTypes.Add(commandType);
         }
 
@@ -66,7 +64,7 @@ namespace Commandr
                 var routeAttribute = cmdType.GetCustomAttribute<CommandRouteAttribute>();
                 if(routeAttribute == null)
                 {
-                    _logger.LogTrace($"No routing attributes found for command: {cmdType.Name}");
+                    _logger.LogTrace("No routing attributes found for command: {CmdTypeName}", cmdType.Name);
                     continue;
                 }
 

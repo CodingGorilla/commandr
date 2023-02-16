@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 
 namespace Commandr.Results
 {
@@ -18,7 +18,7 @@ namespace Commandr.Results
         {
             context.Response.StatusCode = 500;
             context.Response.ContentType = "application/problem+json";
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(GetProblemDetails()));
+            await JsonSerializer.SerializeAsync(context.Response.Body, GetProblemDetails());
 
             await context.Response.CompleteAsync();
         }

@@ -2,10 +2,9 @@
 {
     internal enum RequestBindingLocation
     {
-        Any,
         Url,
         QueryParameter,
         Body,
-        FormField,
+        FormField
     }
 }

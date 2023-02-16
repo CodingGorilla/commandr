@@ -13,29 +13,19 @@ namespace Commandr.Results
 
     internal class CommandResultFactory : ICommandResultFactory
     {
-        public ICommandResult Status(int statusCode)
-        {
-            return new StatusCodeResult(statusCode);
-        }
+        public ICommandResult Status(int statusCode) 
+            => new StatusCodeResult(statusCode);
 
-        public ICommandResult Status(int statusCode, object content)
-        {
-            return new ContentStatusCodeResult(content, statusCode);
-        }
+        public ICommandResult Status(int statusCode, object content) 
+            => new ContentStatusCodeResult(content, statusCode);
 
-        public ICommandResult NotFound()
-        {
-            return new NotFoundResult();
-        }
+        public ICommandResult NotFound() 
+            => new NotFoundResult();
 
-        public ICommandResult Ok()
-        {
-            return new StatusCodeResult(200);
-        }
+        public ICommandResult Ok() 
+            => new StatusCodeResult(200);
 
-        public ICommandResult Ok(object content)
-        {
-            return new OkContentResult(content);
-        }
+        public ICommandResult Ok(object content) 
+            => new OkContentResult(content);
     }
 }
