@@ -5,7 +5,7 @@ using ToDo.Models;
 
 namespace ToDo.Commands
 {
-    [HttpPostCommand("/todos", typeof(Todo))]
+    [HttpPostCommand("/todos/form", typeof(Todo))]
     public class CreateToDoFromFormCommand
     {
         public Task<TodoModel> InvokeAsync([FromFormField("label")] string label, [FromFormField("notes")] string notes)

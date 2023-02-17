@@ -7,6 +7,7 @@ namespace ToDo
         public Guid Id { get; set; }
         public string Label { get; set; }
         public string Notes { get; set; }
-        public string Type => "Simple";
+        public string Priority { get; set; }
+        public IEnumerable<string> Categories { get; set; }
     }
 }

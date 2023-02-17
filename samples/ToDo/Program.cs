@@ -1,4 +1,6 @@
 using Commandr;
+using Microsoft.EntityFrameworkCore;
+using ToDo;
 using ToDo.Commands;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,9 @@ builder.Services.AddTransient<PingCommand>();
 builder.Services.AddTransient<LogSomethingCommand>();
 builder.Services.AddTransient<EchoCommandHandler>();
 builder.Services.AddTransient<CreateToDoFromFormCommand>();
+builder.Services.AddTransient<CreateTodoCommand>();
+
+builder.Services.AddDbContext<TodosContext>(opts => opts.UseSqlite(builder.Configuration.GetConnectionString("TodoDb")));
 
 var app = builder.Build();
 
