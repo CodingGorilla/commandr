@@ -77,11 +77,14 @@ namespace Commandr
                                           RoutePatternFactory.Parse(routeAttribute.Template),
                                           routeAttribute.Order)
                                       {
-                                          DisplayName = $"Command: {cmdType.Name}"
+                                          DisplayName = $"Command: {cmdType.Name}",
                                       };
                 
                 endpointBuilder.Metadata.Add(new HttpMethodMetadata(new[] { routeAttribute.Method }));
 
+                if(routeAttribute.ResponseType != null)
+                    endpointBuilder.Metadata.Add(new RouteResponseTypeMetadata(routeAttribute.ResponseType));
+                
                 if(authorizeAttribute != null)
                     endpointBuilder.Metadata.Add(authorizeAttribute);
 

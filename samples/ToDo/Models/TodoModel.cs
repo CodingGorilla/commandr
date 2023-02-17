@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace ToDo
+namespace ToDo.Models
 {
-    public class Todo
+    public class TodoModel
     {
         public Guid Id { get; set; }
         public string Label { get; set; }
         public string Notes { get; set; }
-        public string Type => "Simple";
     }
 }

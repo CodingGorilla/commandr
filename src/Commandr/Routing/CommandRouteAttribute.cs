@@ -8,10 +8,11 @@ namespace Commandr.Routing
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class CommandRouteAttribute : Attribute
     {
-        public CommandRouteAttribute(string template, string method)
+        public CommandRouteAttribute(string template, string method, Type? responseType)
         {
             Template = template;
             Method = method;
+            ResponseType = responseType;
         }
 
         /// <summary>
@@ -23,6 +24,11 @@ namespace Commandr.Routing
         /// The HTTP verb used to execute this command
         /// </summary>
         public string Method { get; }
+
+        /// <summary>
+        /// Indicates the type that the command response should be mapped to
+        /// </summary>
+        public Type? ResponseType { get; }
 
         /// <summary>
         /// The endpoint routing evaluation order

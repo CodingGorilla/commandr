@@ -1,8 +1,11 @@
-﻿namespace Commandr.Routing
+﻿using System;
+
+namespace Commandr.Routing
 {
     public class HttpPutCommandAttribute : CommandRouteAttribute
     {
-        public HttpPutCommandAttribute(string template) : base(template, "PUT")
+        public HttpPutCommandAttribute(string template, Type? responseType = null)
+            : base(template, "PUT", responseType)
         {
         }
     }

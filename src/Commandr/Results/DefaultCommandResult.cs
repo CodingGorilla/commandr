@@ -8,10 +8,14 @@ namespace Commandr.Results
     public class DefaultCommandResult : ICommandResult
     {
         private readonly object? _result;
+        private readonly Type? _responseType;
+        private readonly IResultMapper _resultMapper;
 
-        public DefaultCommandResult(object? result)
+        public DefaultCommandResult(object? result, Type? responseType, IResultMapper resultMapper)
         {
             _result = result;
+            _responseType = responseType;
+            _resultMapper = resultMapper;
         }
 
         public async Task ExecuteAsync(HttpContext context)
@@ -27,44 +31,15 @@ namespace Commandr.Results
             }
             else
             {
+                var finalResponse = _result;
+                if(_responseType != null)
+                    finalResponse = _resultMapper.MapResult(_result, _responseType);
+
                 context.Response.StatusCode = 200;
-                await JsonSerializer.SerializeAsync(context.Response.Body, _result);
+                await JsonSerializer.SerializeAsync(context.Response.Body, finalResponse);
             }
 
             await context.Response.CompleteAsync();
-        }
-
-        private static ICommandResult DetermineBestResponseType(object result)
-        {
-            switch(result)
-            {
-                case null:
-                    return new StatusCodeResult(204); // No content
-
-                case string stringResult:
-                    return new PlainTextResult(200, stringResult);
-
-                case sbyte _: 
-                case byte _: 
-                case short _:
-                case ushort _:
-                case int _: 
-                case uint _: 
-                case long _: 
-                case ulong _:
-                case float _:
-                case double _: 
-                case decimal _:
-                    return new PlainTextResult(200, result.ToString());
-
-                case Exception ex:
-                    return new ExceptionResult(ex);
-
-                // TODO: Others?
-
-                default:
-                    return new OkContentResult(result);
-            }
         }
     }
 }

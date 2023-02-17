@@ -1,21 +1,26 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Commandr.Binding;
 using Commandr.Exceptions;
 using Commandr.Results;
+using Commandr.Routing;
 using Commandr.Utility;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 namespace Commandr
 {
     public class DefaultCommandDispatcher : ICommandDispatcher
     {
         private readonly Type _commandType;
+        private readonly IResultMapper _mapper;
 
-        public DefaultCommandDispatcher(Type commandType)
+        public DefaultCommandDispatcher(Type commandType, IResultMapper mapper)
         {
             _commandType = commandType;
+            _mapper = mapper;
         }
 
         public async Task Dispatch(HttpContext context)
@@ -26,17 +31,21 @@ namespace Commandr
 
             var commandInvokeMethod = LocateCommandInvokeMethod();
             if(commandInvokeMethod == null)
-            {
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsync($"Unable to locate the Invoke method for command: {_commandType.Name}");
-                await context.Response.CompleteAsync();
-                return;
-            }
+                throw new CommandHandlerInvokeMethodNotFoundException(_commandType);
 
             var commandArguments = await new ArgumentBinder(commandInvokeMethod).GetMethodParametersAsync(context);
 
-            var result = commandInvokeMethod.Invoke(commandHandler, commandArguments);
+            object? result;
             object? finalResult = null;
+
+            try
+            {
+                result = commandInvokeMethod.Invoke(commandHandler, commandArguments);
+            }
+            catch(Exception ex)
+            {
+                throw new CommandInvocationException(_commandType, commandInvokeMethod.Name, ex);
+            }
 
             var resultType = result?.GetType() ?? typeof(void);
             if(resultType.BaseType == typeof(Task) || resultType.BaseType?.GetGenericTypeDefinition() == typeof(Task<>))
@@ -56,7 +65,8 @@ namespace Commandr
                 await commandResult.ExecuteAsync(context).ConfigureAwait(false);
             else
             {
-                var defaultResult = new DefaultCommandResult(finalResult);
+                var responseType = context.GetEndpoint()?.Metadata.OfType<RouteResponseTypeMetadata>().SingleOrDefault()?.RouteResponseType;
+                var defaultResult = new DefaultCommandResult(finalResult, responseType, _mapper);
                 await defaultResult.ExecuteAsync(context).ConfigureAwait(false);
             }
         }

@@ -1,16 +1,16 @@
 ﻿using System;
-using Commandr;
 using Commandr.Binding;
 using Commandr.Routing;
+using ToDo.Models;
 
 namespace ToDo.Commands
 {
-    [HttpPostCommand("/todos")]
+    [HttpPostCommand("/todos", typeof(Todo))]
     public class CreateToDoFromFormCommand
     {
-        public Task<Todo> InvokeAsync([FromFormField("label")] string label, [FromFormField("notes")] string notes)
+        public Task<TodoModel> InvokeAsync([FromFormField("label")] string label, [FromFormField("notes")] string notes)
         {
-            return Task.FromResult(new Todo { Label = label, Notes = notes, Id = Guid.NewGuid() });
+            return Task.FromResult(new TodoModel() { Label = label, Notes = notes, Id = Guid.NewGuid() });
         }
     }
 }

@@ -4,7 +4,8 @@ namespace Commandr.Routing
 {
     public class HttpDeleteCommandAttribute : CommandRouteAttribute
     {
-        public HttpDeleteCommandAttribute(string template) : base(template, "DELETE")
+        public HttpDeleteCommandAttribute(string template, Type? responseType = null) 
+            : base(template, "DELETE", responseType)
         {
         }
     }
