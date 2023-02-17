@@ -30,7 +30,7 @@ namespace Commandr
 
         public void AddExecutingAssembly()
         {
-            AddAssembly(Assembly.GetEntryAssembly());
+            AddAssembly(Assembly.GetEntryAssembly()!);
         }
 
         public void AddCommand<TCommand>()

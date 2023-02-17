@@ -4,11 +4,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Commandr.Binding;
 using Commandr.Exceptions;
+using Commandr.Metadata;
 using Commandr.Results;
-using Commandr.Routing;
-using Commandr.Utility;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 
 namespace Commandr
 {
@@ -29,7 +27,7 @@ namespace Commandr
             if(commandHandler == null)
                 throw new CommandHandlerNotFoundException(_commandType);
 
-            var commandInvokeMethod = LocateCommandInvokeMethod();
+            var commandInvokeMethod = GetCommandInvokeMethod(context);
             if(commandInvokeMethod == null)
                 throw new CommandHandlerInvokeMethodNotFoundException(_commandType);
 
@@ -61,31 +59,22 @@ namespace Commandr
                 finalResult = result;
             }
 
+            await HandleCommandResult(context, finalResult);
+        }
+
+        private async Task HandleCommandResult(HttpContext context, object? finalResult)
+        {
             if(finalResult is ICommandResult commandResult)
                 await commandResult.ExecuteAsync(context).ConfigureAwait(false);
             else
             {
-                var responseType = context.GetEndpoint()?.Metadata.OfType<RouteResponseTypeMetadata>().SingleOrDefault()?.RouteResponseType;
+                var responseType = context.GetEndpoint()?.Metadata.OfType<RouteResponseTypeMetadata>().SingleOrDefault()?.Type;
                 var defaultResult = new DefaultCommandResult(finalResult, responseType, _mapper);
                 await defaultResult.ExecuteAsync(context).ConfigureAwait(false);
             }
         }
 
-        private MethodInfo? LocateCommandInvokeMethod()
-        {
-            var methods = _commandType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
-            foreach(var methodInfo in methods)
-            {
-                var methodName = methodInfo.Name;
-                if(methodName.EndsWith("Async", StringComparison.InvariantCultureIgnoreCase))
-                    methodName = methodName.Remove(methodName.Length - 5, 5);
-
-                if(methodName.EqualsIgnoreCase("handles") || methodName.EqualsIgnoreCase("invoke") || methodName.EqualsIgnoreCase("invokes") ||
-                   methodName.EqualsIgnoreCase("consumes"))
-                    return methodInfo;
-            }
-
-            return null;
-        }
+        private static MethodInfo GetCommandInvokeMethod(HttpContext context)
+            => context.GetEndpoint()!.Metadata.OfType<MethodInfo>().Single();
     }
 }
