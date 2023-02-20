@@ -20,12 +20,12 @@ namespace Commandr.Results
 
             foreach(var destProp in destProps)
             {
-                if(sourceProps.TryGetValue(destProp.Name, out var sourceProp))
-                {
-                    var sourceValue = sourceProp.GetValue(source);
-                    var convertedDestValue = Convert.ChangeType(sourceValue, destProp.PropertyType);
-                    destProp.SetValue(dest, convertedDestValue);
-                }
+                if(!sourceProps.TryGetValue(destProp.Name, out var sourceProp)) 
+                    continue;
+
+                var sourceValue = sourceProp.GetValue(source);
+                var convertedDestValue = Convert.ChangeType(sourceValue, destProp.PropertyType);
+                destProp.SetValue(dest, convertedDestValue);
             }
 
             return dest!;

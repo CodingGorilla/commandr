@@ -14,12 +14,11 @@ namespace Commandr
 
         public static void AddCommandr(this IServiceCollection serviceCollection, Action<CommandrConfigurationBuilder>? configBuilder = null)
         {
-            serviceCollection.AddSingleton<ICommandResultFactory, CommandResultFactory>();
             serviceCollection.AddTransient<CommandrEndpointDataSource>();
 
             var builder = new CommandrConfigurationBuilder(serviceCollection);
             configBuilder?.Invoke(builder);
-            
+
             builder.RegisterDependencies();
         }
     }
@@ -34,6 +33,9 @@ namespace Commandr
         public Action<IServiceCollection> RegisterResultMapper { get; set; }
             = sc => sc.AddTransient<IResultMapper, DefaultResultMapper>();
 
+        public Action<IServiceCollection> RegisterResultFactory { get; set; } =
+            sc => sc.AddSingleton<ICommandResultFactory, DefaultCommandResultFactory>();
+
         internal CommandrConfigurationBuilder(IServiceCollection serviceCollection)
         {
             ServiceCollection = serviceCollection;
@@ -43,6 +45,7 @@ namespace Commandr
         {
             RegisterCommandDispatcher(ServiceCollection);
             RegisterResultMapper(ServiceCollection);
+            RegisterResultFactory(ServiceCollection);
         }
     }
 }
