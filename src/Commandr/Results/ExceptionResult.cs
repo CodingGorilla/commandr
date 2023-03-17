@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Commandr.Serialization;
 using Microsoft.AspNetCore.Http;
 
 namespace Commandr.Results
@@ -8,17 +9,19 @@ namespace Commandr.Results
     internal class ExceptionResult : ICommandResult
     {
         private readonly Exception _exception;
+        private readonly ICommandSerializer _serializer;
 
-        public ExceptionResult(Exception exception)
+        public ExceptionResult(Exception exception, ICommandSerializer serializer)
         {
             _exception = exception;
+            _serializer = serializer;
         }
 
         public async Task ExecuteAsync(HttpContext context)
         {
             context.Response.StatusCode = 500;
             context.Response.ContentType = "application/problem+json";
-            await JsonSerializer.SerializeAsync(context.Response.Body, GetProblemDetails());
+            await _serializer.SerializeResultAsync(context.Response.Body, GetProblemDetails());
 
             await context.Response.CompleteAsync();
         }
@@ -33,17 +36,17 @@ namespace Commandr.Results
             return new ProblemDetails
                    {
                        Title = _exception.Message,
-                       Detail = _exception.StackTrace
+                       Detail = _exception.StackTrace ?? String.Empty
                    };
         }
 
         private class ProblemDetails
         {
-            public string Type { get; set; }
-            public string Title { get; set; }
-            public string Detail { get; set; }
+            public string Type { get; set; } = String.Empty;
+            public string Title { get; set; } = String.Empty;
+            public string Detail { get; set; } = String.Empty;
             public string Status { get; } = "500";
-            public string Instance { get; set; }
+            public string Instance { get; set; } = String.Empty;
         }
     }
 }

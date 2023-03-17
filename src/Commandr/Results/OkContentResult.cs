@@ -1,10 +1,11 @@
 ﻿using System;
+using Commandr.Serialization;
 
 namespace Commandr.Results
 {
-    public class OkContentResult : ContentResult
+    public class OkContentResult : JsonContentResult
     {
-        public OkContentResult(object content) : base(content)
+        public OkContentResult(object content, ICommandSerializer serializer) : base(content, serializer)
         {
         }
 

@@ -6,6 +6,7 @@ using Commandr.Binding;
 using Commandr.Exceptions;
 using Commandr.Metadata;
 using Commandr.Results;
+using Commandr.Serialization;
 using Microsoft.AspNetCore.Http;
 
 namespace Commandr
@@ -14,11 +15,13 @@ namespace Commandr
     {
         private readonly Type _commandType;
         private readonly IResultMapper _mapper;
+        private readonly ICommandSerializer _serializer;
 
-        public DefaultCommandDispatcher(Type commandType, IResultMapper mapper)
+        public DefaultCommandDispatcher(Type commandType, IResultMapper mapper, ICommandSerializer serializer)
         {
             _commandType = commandType;
             _mapper = mapper;
+            _serializer = serializer;
         }
 
         public async Task Dispatch(HttpContext context)
@@ -31,7 +34,7 @@ namespace Commandr
             if(commandInvokeMethod == null)
                 throw new CommandHandlerInvokeMethodNotFoundException(_commandType);
 
-            var commandArguments = await new ArgumentBinder(commandInvokeMethod).GetMethodParametersAsync(context);
+            var commandArguments = await new ArgumentBinder(commandInvokeMethod, _serializer).GetMethodParametersAsync(context);
 
             object? result;
             object? finalResult = null;
@@ -69,7 +72,7 @@ namespace Commandr
             else
             {
                 var responseType = context.GetEndpoint()?.Metadata.OfType<RouteResponseTypeMetadata>().SingleOrDefault()?.Type;
-                var defaultResult = new DefaultCommandResult(finalResult, responseType, _mapper);
+                var defaultResult = new DefaultCommandResult(finalResult, responseType, _mapper, _serializer);
                 await defaultResult.ExecuteAsync(context).ConfigureAwait(false);
             }
         }

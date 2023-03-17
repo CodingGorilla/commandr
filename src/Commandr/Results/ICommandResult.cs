@@ -12,4 +12,9 @@ namespace Commandr.Results
     {
         Task ExecuteAsync(HttpContext context);
     }
+
+    public interface ICommandResult<out T> : ICommandResult
+    {
+        public T Result { get; }
+    }
 }

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Commandr.Serialization;
 using Microsoft.AspNetCore.Http;
 
 namespace Commandr.Results
@@ -9,11 +10,13 @@ namespace Commandr.Results
     public class LocationResult : ICommandResult
     {
         private readonly int _statusCode;
+        private readonly ICommandSerializer _serializer;
 
-        public LocationResult(int statusCode, string location, object? instance)
+        public LocationResult(int statusCode, string location, object? instance, ICommandSerializer serializer)
         {
             _statusCode = statusCode;
             Instance = instance;
+            _serializer = serializer;
             Location = location;
         }
 
@@ -28,7 +31,7 @@ namespace Commandr.Results
             if(Instance != null)
             {
                 context.Response.ContentType = "application/json";
-                await JsonSerializer.SerializeAsync(context.Response.Body, Instance);
+                await _serializer.SerializeResultAsync(context.Response.Body, Instance);
             }
         }
     }

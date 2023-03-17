@@ -1,11 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Commandr.Utility;
+using Commandr.Serialization;
 using Microsoft.AspNetCore.Http;
 
 namespace Commandr.Binding
@@ -13,10 +11,12 @@ namespace Commandr.Binding
     internal class ArgumentBinder
     {
         private readonly MethodInfo _handlerMethod;
+        private readonly ICommandSerializer _serializer;
 
-        public ArgumentBinder(MethodInfo handlerMethod)
+        public ArgumentBinder(MethodInfo handlerMethod, ICommandSerializer serializer)
         {
             _handlerMethod = handlerMethod;
+            _serializer = serializer;
         }
 
         public async Task<object?[]> GetMethodParametersAsync(HttpContext context)
@@ -39,14 +39,13 @@ namespace Commandr.Binding
             return methodParameters;
         }
 
-        private static async Task<object?> GetParameterFromRequestAsync(ParameterInfo parameter, HttpRequest request)
+        private async Task<object?> GetParameterFromRequestAsync(ParameterInfo parameter, HttpRequest request)
         {
             var bindingAttribute = parameter.GetCustomAttribute<CommandBindingAttribute>();
             switch(bindingAttribute?.Location)
             {
                 case RequestBindingLocation.Body:
-                    return await JsonSerializer.DeserializeAsync(request.Body, parameter.ParameterType,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return await _serializer.DeserializeAsync(request.Body, parameter.ParameterType);
                 case RequestBindingLocation.Url:
                     return request.RouteValues.TryGetValue(bindingAttribute.Name, out var urlResult) ? urlResult : null;
                 case RequestBindingLocation.QueryParameter:
